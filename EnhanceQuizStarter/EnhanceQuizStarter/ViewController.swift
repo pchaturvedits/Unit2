@@ -80,6 +80,9 @@ class ViewController: UIViewController {
     
     }
   
+    
+    
+    
     func displayScore() {
         // Hide the answer uttons
         trueButton.isHidden = true
