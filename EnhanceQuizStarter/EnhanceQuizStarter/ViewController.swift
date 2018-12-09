@@ -7,30 +7,29 @@
 //
 
 import UIKit
-import GameKit
+
 import AudioToolbox
 import AVFoundation
 
 class ViewController: UIViewController {
     
     // MARK: - Properties
-    
-    let questionsPerRound = trivia.count
+    var gameManager = GameManager()
     var questionsAsked = 0
     var correctQuestions = 0
     var indexOfSelectedQuestion = 0
-    var indexDict = [Int]()
-    var playTime = 40
-    let staticPlayTime = 40
+    
+    var playTime = 15
+    let staticPlayTime = 15
     
     var gameSound: SystemSoundID = 0
-    var gameCorrect: SystemSoundID = 1
-    var gameIncorrect: SystemSoundID = 2
+    var gameCorrect: SystemSoundID = 0
+    var gameIncorrect: SystemSoundID = 0
     
+    var timer = Timer()//Timer(fire: Date(), interval: 0, repeats: true, block: {_ in })
     
-    //  var playTime = 40  // Seconds
-    //let staticPlayTime = 40 // Seconds
-    //var timer = Timer()
+  
+   
     
     // MARK: - Outlets
     
@@ -43,9 +42,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var answerStatuslabel: UILabel!
     @IBOutlet weak var timerlabel: UILabel!
     
-    var timer = Timer()//Timer(fire: Date(), interval: 0, repeats: true, block: {_ in })
-    
-    
+
     
     
     override func viewDidLoad() {
@@ -56,9 +53,10 @@ class ViewController: UIViewController {
         displayQuestion()
         runTimer()
         updateTimer()
-        //runTimer()
+       
     }
     
+   
     // MARK: - Helpers
     
     func loadGameStartSound() {
@@ -86,11 +84,14 @@ class ViewController: UIViewController {
     func incorrectAnswerSound(){
         AudioServicesPlaySystemSound(gameIncorrect)
     }
+  
     
     func displayQuestion() {
-        
+        questionsAsked += 1
+        resetTimer()
+       
         answerStatuslabel.text = ""
-        playAgainButton.isHidden = false
+       
         
         playAgainButton.setTitle("Next Question", for: UIControlState.normal)
         trueButton.setTitleColor(UIColor.white, for: UIControlState.normal)
@@ -98,45 +99,15 @@ class ViewController: UIViewController {
         option3Button.setTitleColor(UIColor.white, for: UIControlState.normal)
         option4Button.setTitleColor(UIColor.white, for: UIControlState.normal)
         
-  //  if indexDict.count <= trivia.count {
-            var isduplicateFound = true
-            while isduplicateFound {
-                indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: trivia.count)
-
-                if indexDict.contains(indexOfSelectedQuestion) {
-                    
-                    isduplicateFound = true
-                }else {
-                    indexDict.append(indexOfSelectedQuestion)
-                    isduplicateFound = false
-                }
-
-            }
-//       }
-       
-    //  indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: trivia.count)
-//
-//        var duplicateFound = false
-//        if indexDict.count > 0 {
-//            for value in indexDict {
-//                if value == indexOfSelectedQuestion {
-//                    indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: trivia.count)
-//                    duplicateFound = true
-//                }
-//
-//            }
-//            if !duplicateFound {
-//                indexDict.append(indexOfSelectedQuestion)
-//            }
-//        }else {
-//            indexDict.append(indexOfSelectedQuestion)
-//
-//        }
         
-              let questionDictionary = trivia[indexOfSelectedQuestion]
-                questionField.text = questionDictionary.question
-                
-         
+        indexOfSelectedQuestion = gameManager.generateRandomNumber()
+        let questionDictionary = gameManager.trivia[indexOfSelectedQuestion]
+        questionField.text = questionDictionary.question
+       
+        trueButton.layer.cornerRadius = 5
+        falseButton.layer.cornerRadius = 5
+        option3Button.layer.cornerRadius = 5
+      option4Button.layer.cornerRadius = 5
         
         if questionDictionary.ansType == 2 {
             trueButton.setTitle(questionDictionary.option1, for: UIControlState.normal)
@@ -155,11 +126,13 @@ class ViewController: UIViewController {
             option3Button.isHidden = false
             option4Button.isHidden = false
         }
-        
-        
     }
+    
+  
+    
     func displayScore() {
         // Hide the answer uttons
+        gameManager.indexDict = []
         trueButton.isHidden = true
         falseButton.isHidden = true
         option3Button.isHidden = true
@@ -168,11 +141,12 @@ class ViewController: UIViewController {
         playAgainButton.setTitle("Play Again", for: UIControlState.normal)
         timerlabel.isHidden = true
         questionField.text = "Way to go!\nYou got \(correctQuestions) out of \(questionsAsked) correct!"
+    
     }
     
     func nextRound() {
         
-        if questionsAsked == questionsPerRound {
+        if questionsAsked == gameManager.trivia.count {
             // Game is over
             displayScore()
         } else {
@@ -183,27 +157,25 @@ class ViewController: UIViewController {
         
     }
     
-    func loadNextRound(delay seconds: Int) {
-        // Converts a delay in seconds to nanoseconds as signed 64 bit integer
-        
-        let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
-        // Calculates a time value to execute the method given current time and delay
-        let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
-        
-        // Executes the nextRound method at the dispatch time on the main queue
-        DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-        }
-    }
+//   func loadNextRound(delay seconds: Int) {
+//     // Converts a delay in seconds to nanoseconds as signed 64 bit integer
+//        
+//   let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
+//        // Calculates a time value to execute the method given current time and delay
+//    let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
+//        
+//        // Executes the nextRound method at the dispatch time on the main queue
+//    DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
+//       }
+// }
     
     // MARK: - Actions
     
     @IBAction func checkAnswer(_ sender: UIButton) {
         // Increment the questions asked counter
-        let selectedQuestionDict = trivia[indexOfSelectedQuestion]
+        let selectedQuestionDict = gameManager.trivia[indexOfSelectedQuestion]
         let correctAnswer = selectedQuestionDict.answer
-       //  answerStatuslabel.text =
-        
-        answerStatuslabel.font =  UIFont.boldSystemFont(ofSize: 20)
+       
         
         func highlightAnswer() {
             if (sender === trueButton){
@@ -237,12 +209,22 @@ class ViewController: UIViewController {
             answerStatuslabel.textColor = UIColor.green
             answerStatuslabel.text = "Correct!"
         } else {
-            answerStatuslabel.textColor = UIColor.orange
-            answerStatuslabel.text = "Sorry, wrong answer!"
+            let attrs1 = [NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 15), NSAttributedStringKey.foregroundColor : UIColor.orange]
+            
+            let attrs2 = [NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 15), NSAttributedStringKey.foregroundColor : UIColor.green]
+            
+            let attributedString1 = NSMutableAttributedString(string:"Wrong answer!", attributes:attrs1)
+            
+            let attributedString2 = NSMutableAttributedString(string:"\nCorrect answer is \(correctAnswer)", attributes:attrs2)
+            
+           
+            attributedString1.append(attributedString2)
+           self.answerStatuslabel.attributedText = attributedString1
+            
             incorrectAnswerSound()
             highlightAnswer()
         }
-        loadNextRound(delay: 2)
+     
         
         
     }
@@ -262,8 +244,8 @@ class ViewController: UIViewController {
             playTime -= 1
             timerlabel.text = "\(playTime)"
         } else if playTime == 0 {
-            // if countdown is 0 game is over and display score
-            displayScore()
+            // if countdown is 0 time to display next question
+            displayQuestion()
         }
         
     }
@@ -277,15 +259,14 @@ class ViewController: UIViewController {
     
     
     @IBAction func playAgain(_ sender: Any) {
+        
         if playAgainButton.currentTitle == "Next Question"{
-            questionsAsked += 1
-          //  displayQuestion()
+          //  questionsAsked += 1
             nextRound()
             
             
         }else if playAgainButton.currentTitle == "Play Again" {
-            
-            indexDict = []
+            gameManager.indexDict = []
             trueButton.isHidden = false
             falseButton.isHidden = false
             option3Button.isHidden = false
@@ -298,7 +279,7 @@ class ViewController: UIViewController {
             resetTimer()
             updateTimer()
             
-            displayQuestion()
+          //  displayQuestion()
             nextRound()
         }
         
@@ -308,3 +289,6 @@ class ViewController: UIViewController {
     
     
 }
+
+
+
