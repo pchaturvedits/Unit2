@@ -1,5 +1,6 @@
 import GameKit
-
+import AudioToolbox
+import AVFoundation
 
 struct ObjectiveType {
     var question: String
@@ -13,6 +14,9 @@ struct ObjectiveType {
 
 struct GameManager{
     var indexDict = [Int]()
+   
+    
+    
     let trivia :[ObjectiveType] =
     [ObjectiveType(question: "Only female koalas can whistle", option1: "True", option2: "False", option3: "None", option4: "None", answer: "False", ansType: 2),
     ObjectiveType(question: "Blue whales are technically whales", option1: "True", option2: "False", option3: "None", option4: "None", answer: "True", ansType: 2),
@@ -49,13 +53,16 @@ struct GameManager{
         }
         return randomNumber
     }
-
-
+    
+    func checkAnswerForQuestion(selectedQuestionDict:ObjectiveType,  btnTitle: String )-> Bool{
+        if selectedQuestionDict.answer == btnTitle {
+            return true
+        }else {
+            return false
+        }
+        
 }
-
-
-
-
+}
 
 
 

@@ -12,11 +12,11 @@
 		972A72B62056F06C0059EF4A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 972A72B42056F06C0059EF4A /* Main.storyboard */; };
 		972A72B82056F06C0059EF4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 972A72B72056F06C0059EF4A /* Assets.xcassets */; };
 		972A72BB2056F06C0059EF4A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 972A72B92056F06C0059EF4A /* LaunchScreen.storyboard */; };
-		C80250F82197E6A6008412DD /* Questionprovider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80250F72197E6A5008412DD /* Questionprovider.swift */; };
 		C87414A421B808ED006D550D /* GameCorrect.wav in Resources */ = {isa = PBXBuildFile; fileRef = C87414A121B808ED006D550D /* GameCorrect.wav */; };
 		C87414A521B808ED006D550D /* GameSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = C87414A221B808ED006D550D /* GameSound.wav */; };
 		C87414A621B808ED006D550D /* GameIncorrect.wav in Resources */ = {isa = PBXBuildFile; fileRef = C87414A321B808ED006D550D /* GameIncorrect.wav */; };
 		C87414A821BC08F2006D550D /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87414A721BC08F2006D550D /* GameManager.swift */; };
+		C87414AC21BE16AA006D550D /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87414AB21BE16AA006D550D /* SoundManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,11 +27,11 @@
 		972A72B72056F06C0059EF4A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		972A72BA2056F06C0059EF4A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		972A72BC2056F06C0059EF4A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C80250F72197E6A5008412DD /* Questionprovider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Questionprovider.swift; sourceTree = "<group>"; };
 		C87414A121B808ED006D550D /* GameCorrect.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = GameCorrect.wav; path = Assets.xcassets/GameCorrect.wav; sourceTree = "<group>"; };
 		C87414A221B808ED006D550D /* GameSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = GameSound.wav; path = Assets.xcassets/GameSound.wav; sourceTree = "<group>"; };
 		C87414A321B808ED006D550D /* GameIncorrect.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = GameIncorrect.wav; path = Assets.xcassets/GameIncorrect.wav; sourceTree = "<group>"; };
 		C87414A721BC08F2006D550D /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
+		C87414AB21BE16AA006D550D /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,8 +66,8 @@
 			children = (
 				972A72B02056F06C0059EF4A /* AppDelegate.swift */,
 				972A72B22056F06C0059EF4A /* ViewController.swift */,
-				C80250F72197E6A5008412DD /* Questionprovider.swift */,
 				C87414A721BC08F2006D550D /* GameManager.swift */,
+				C87414AB21BE16AA006D550D /* SoundManager.swift */,
 				972A72B42056F06C0059EF4A /* Main.storyboard */,
 				972A72B72056F06C0059EF4A /* Assets.xcassets */,
 				C87414A121B808ED006D550D /* GameCorrect.wav */,
@@ -154,8 +154,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C80250F82197E6A6008412DD /* Questionprovider.swift in Sources */,
 				C87414A821BC08F2006D550D /* GameManager.swift in Sources */,
+				C87414AC21BE16AA006D550D /* SoundManager.swift in Sources */,
 				972A72B32056F06C0059EF4A /* ViewController.swift in Sources */,
 				972A72B12056F06C0059EF4A /* AppDelegate.swift in Sources */,
 			);

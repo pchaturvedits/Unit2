@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     
     // MARK: - Properties
     var gameManager = GameManager()
+    var soundManager = SoundManager()
     var questionsAsked = 0
     var correctQuestions = 0
     var indexOfSelectedQuestion = 0
@@ -22,11 +23,8 @@ class ViewController: UIViewController {
     var playTime = 15
     let staticPlayTime = 15
     
-    var gameSound: SystemSoundID = 0
-    var gameCorrect: SystemSoundID = 0
-    var gameIncorrect: SystemSoundID = 0
-    
-    var timer = Timer()//Timer(fire: Date(), interval: 0, repeats: true, block: {_ in })
+   
+    var timer = Timer()
     
   
    
@@ -47,9 +45,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadGameStartSound()
-        loadAnswerSound()
-        playGameStartSound()
+      soundManager.loadGameStartSound()
+      soundManager.loadAnswerSound()
+    soundManager.playGameStartSound()
         displayQuestion()
         runTimer()
         updateTimer()
@@ -58,33 +56,6 @@ class ViewController: UIViewController {
     
    
     // MARK: - Helpers
-    
-    func loadGameStartSound() {
-        let path = Bundle.main.path(forResource: "GameSound", ofType: "wav")
-        let soundUrl = URL(fileURLWithPath: path!)
-        AudioServicesCreateSystemSoundID(soundUrl as CFURL, &gameSound)
-        
-    }
-    func loadAnswerSound() {
-        let path2 = Bundle.main.path(forResource: "GameCorrect" , ofType: "wav")
-        let soundUrl1 = URL(fileURLWithPath: path2!)
-        AudioServicesCreateSystemSoundID(soundUrl1 as CFURL, &gameCorrect)
-        let path3 = Bundle.main.path(forResource: "GameIncorrect", ofType: "wav")
-        let soundUrl2 = URL(fileURLWithPath: path3!)
-        AudioServicesCreateSystemSoundID(soundUrl2 as CFURL, &gameIncorrect)
-    }
-    
-    func playGameStartSound() {
-        AudioServicesPlaySystemSound(gameSound)
-    }
-    
-    func correctAnswerSound() {
-        AudioServicesPlaySystemSound(gameCorrect)
-    }
-    func incorrectAnswerSound(){
-        AudioServicesPlaySystemSound(gameIncorrect)
-    }
-  
     
     func displayQuestion() {
         questionsAsked += 1
@@ -125,6 +96,7 @@ class ViewController: UIViewController {
             falseButton.isHidden = false
             option3Button.isHidden = false
             option4Button.isHidden = false
+            
         }
     }
     
@@ -157,17 +129,6 @@ class ViewController: UIViewController {
         
     }
     
-//   func loadNextRound(delay seconds: Int) {
-//     // Converts a delay in seconds to nanoseconds as signed 64 bit integer
-//        
-//   let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
-//        // Calculates a time value to execute the method given current time and delay
-//    let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
-//        
-//        // Executes the nextRound method at the dispatch time on the main queue
-//    DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-//       }
-// }
     
     // MARK: - Actions
     
@@ -176,39 +137,17 @@ class ViewController: UIViewController {
         let selectedQuestionDict = gameManager.trivia[indexOfSelectedQuestion]
         let correctAnswer = selectedQuestionDict.answer
        
+        highlightAnswer(sender)
         
-        func highlightAnswer() {
-            if (sender === trueButton){
-                falseButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                option3Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                option4Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                
-                
-            }else if (sender === falseButton){
-                trueButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                option3Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                option4Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-            }else if(sender === option3Button){
-                falseButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                trueButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                option4Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-            }else if (sender === option4Button){
-                falseButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                option3Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-                trueButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
-            }
-        }
-        
-        if (sender === trueButton && trueButton.currentTitle == correctAnswer) ||
-            (sender === falseButton && falseButton.currentTitle == correctAnswer) ||
-            (sender === option3Button && option3Button.currentTitle == correctAnswer) ||
-            (sender === option4Button && option4Button.currentTitle == correctAnswer){
-            correctQuestions += 1
-            correctAnswerSound()
-            highlightAnswer()
+        let isCorrectAnswer = gameManager.checkAnswerForQuestion(selectedQuestionDict: selectedQuestionDict, btnTitle: sender.currentTitle ?? "")
+        if isCorrectAnswer {
+            correctQuestions+=1
+            soundManager.correctAnswerSound()
+            highlightAnswer(sender)
             answerStatuslabel.textColor = UIColor.green
             answerStatuslabel.text = "Correct!"
-        } else {
+
+        }else {
             let attrs1 = [NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 15), NSAttributedStringKey.foregroundColor : UIColor.orange]
             
             let attrs2 = [NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 15), NSAttributedStringKey.foregroundColor : UIColor.green]
@@ -217,18 +156,38 @@ class ViewController: UIViewController {
             
             let attributedString2 = NSMutableAttributedString(string:"\nCorrect answer is \(correctAnswer)", attributes:attrs2)
             
-           
-            attributedString1.append(attributedString2)
-           self.answerStatuslabel.attributedText = attributedString1
             
-            incorrectAnswerSound()
-            highlightAnswer()
+            attributedString1.append(attributedString2)
+            self.answerStatuslabel.attributedText = attributedString1
+            
+            soundManager.incorrectAnswerSound()
+            highlightAnswer(sender)
         }
-     
-        
         
     }
     
+    func highlightAnswer(_ sender: UIButton) {
+        if (sender === trueButton){
+            falseButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            option3Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            option4Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            
+            
+        }else if (sender === falseButton){
+            trueButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            option3Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            option4Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+        }else if(sender === option3Button){
+            falseButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            trueButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            option4Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+        }else if (sender === option4Button){
+            falseButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            option3Button.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+            trueButton.setTitleColor(UIColor.lightText, for: UIControlState.normal)
+        }
+    }
+
     
     // Helper functions for lighting round
     // The main countdown timer for the game
@@ -261,7 +220,7 @@ class ViewController: UIViewController {
     @IBAction func playAgain(_ sender: Any) {
         
         if playAgainButton.currentTitle == "Next Question"{
-          //  questionsAsked += 1
+          
             nextRound()
             
             
@@ -279,15 +238,10 @@ class ViewController: UIViewController {
             resetTimer()
             updateTimer()
             
-          //  displayQuestion()
             nextRound()
         }
         
     }
-    
-    
-    
-    
 }
 
 
