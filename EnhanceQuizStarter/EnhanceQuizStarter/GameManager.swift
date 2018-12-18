@@ -14,8 +14,12 @@ struct ObjectiveType {
 
 struct GameManager{
     var indexDict = [Int]()
-   
+    var questionsAsked = 0
+    var correctQuestions = 0
+    var indexOfSelectedQuestion = 0
     
+    var gameRunTime = 15
+    let staticPlayTime = 15
     
     let trivia :[ObjectiveType] =
     [ObjectiveType(question: "Only female koalas can whistle", option1: "True", option2: "False", option3: "None", option4: "None", answer: "False", ansType: 2),

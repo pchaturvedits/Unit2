@@ -8,26 +8,15 @@
 
 import UIKit
 
-import AudioToolbox
-import AVFoundation
-
 class ViewController: UIViewController {
     
     // MARK: - Properties
     var gameManager = GameManager()
     var soundManager = SoundManager()
-    var questionsAsked = 0
-    var correctQuestions = 0
-    var indexOfSelectedQuestion = 0
     
-    var playTime = 15
-    let staticPlayTime = 15
     
    
     var timer = Timer()
-    
-  
-   
     
     // MARK: - Outlets
     
@@ -58,7 +47,7 @@ class ViewController: UIViewController {
     // MARK: - Helpers
     
     func displayQuestion() {
-        questionsAsked += 1
+        gameManager.questionsAsked += 1
         resetTimer()
        
         answerStatuslabel.text = ""
@@ -71,8 +60,8 @@ class ViewController: UIViewController {
         option4Button.setTitleColor(UIColor.white, for: UIControlState.normal)
         
         
-        indexOfSelectedQuestion = gameManager.generateRandomNumber()
-        let questionDictionary = gameManager.trivia[indexOfSelectedQuestion]
+       gameManager.indexOfSelectedQuestion = gameManager.generateRandomNumber()
+        let questionDictionary = gameManager.trivia[gameManager.indexOfSelectedQuestion]
         questionField.text = questionDictionary.question
        
         trueButton.layer.cornerRadius = 5
@@ -112,13 +101,13 @@ class ViewController: UIViewController {
         answerStatuslabel.text = ""
         playAgainButton.setTitle("Play Again", for: UIControlState.normal)
         timerlabel.isHidden = true
-        questionField.text = "Way to go!\nYou got \(correctQuestions) out of \(questionsAsked) correct!"
+        questionField.text = "Way to go!\nYou got \(gameManager.correctQuestions) out of \(gameManager.questionsAsked) correct!"
     
     }
     
     func nextRound() {
         
-        if questionsAsked == gameManager.trivia.count {
+        if gameManager.questionsAsked == gameManager.trivia.count {
             // Game is over
             displayScore()
         } else {
@@ -134,14 +123,14 @@ class ViewController: UIViewController {
     
     @IBAction func checkAnswer(_ sender: UIButton) {
         // Increment the questions asked counter
-        let selectedQuestionDict = gameManager.trivia[indexOfSelectedQuestion]
-        let correctAnswer = selectedQuestionDict.answer
+        let selectedQuestionDict = gameManager.trivia[gameManager.indexOfSelectedQuestion]
+    let correctAnswer = selectedQuestionDict.answer
        
         highlightAnswer(sender)
         
         let isCorrectAnswer = gameManager.checkAnswerForQuestion(selectedQuestionDict: selectedQuestionDict, btnTitle: sender.currentTitle ?? "")
         if isCorrectAnswer {
-            correctQuestions+=1
+            gameManager.correctQuestions+=1
             soundManager.correctAnswerSound()
             highlightAnswer(sender)
             answerStatuslabel.textColor = UIColor.green
@@ -199,10 +188,10 @@ class ViewController: UIViewController {
     // Showing the countdown on screen
     @objc func updateTimer(){
         
-        if playTime > 0 {
-            playTime -= 1
-            timerlabel.text = "\(playTime)"
-        } else if playTime == 0 {
+        if gameManager.gameRunTime > 0 {
+            gameManager.gameRunTime -= 1
+            timerlabel.text = "\(gameManager.gameRunTime)"
+        } else if gameManager.gameRunTime == 0 {
             // if countdown is 0 time to display next question
             displayQuestion()
         }
@@ -211,12 +200,9 @@ class ViewController: UIViewController {
     
     
     func resetTimer() {
-        playTime = staticPlayTime
+        gameManager.gameRunTime = gameManager.staticPlayTime
     }
-    
-    
-    
-    
+
     @IBAction func playAgain(_ sender: Any) {
         
         if playAgainButton.currentTitle == "Next Question"{
@@ -233,8 +219,9 @@ class ViewController: UIViewController {
             
             playAgainButton.isHidden = false
             timerlabel.isHidden = false
-            questionsAsked = 0
-            correctQuestions = 0
+            gameManager.questionsAsked = 0
+            gameManager.correctQuestions = 0
+            gameManager.indexOfSelectedQuestion = 0
             resetTimer()
             updateTimer()
             
